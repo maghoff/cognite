@@ -46,4 +46,11 @@ Plan:
 
 10:30: 1 and 2 done
 
-10:45: Deadline
+10:40: Dynamic state on the server
+
+10:45: Deadline. `git tag deadline`.
+
+Working on point 3, "Add endpoint for posting a new message"
+
+10:50: Implemented `/add` endpoint. Rounding off.
+

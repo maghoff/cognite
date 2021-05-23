@@ -1,11 +1,15 @@
-use serde_derive::Serialize;
+use serde_derive::{Deserialize, Serialize};
 use slog::{info, o};
 use slog::{Drain, Logger};
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
-use warp::{http::HeaderValue, hyper::header::CONTENT_TYPE, Filter, Rejection, Reply};
+use warp::{
+    http::{self, HeaderValue},
+    hyper::header::CONTENT_TYPE,
+    Filter, Rejection, Reply,
+};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 struct Message {
     id: u32,
     text: String,
@@ -46,6 +50,21 @@ async fn handle_messages(store: Store) -> Result<impl Reply, Rejection> {
     Ok(res)
 }
 
+// Heavy inspiration from
+// https://blog.logrocket.com/creating-a-rest-api-in-rust-with-warp/
+fn json_body() -> impl Filter<Extract = (Message,), Error = warp::Rejection> + Clone {
+    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
+}
+
+async fn add_message(message: Message, store: Store) -> Result<impl warp::Reply, warp::Rejection> {
+    store.messages.lock().unwrap().push(message);
+
+    Ok(warp::reply::with_status(
+        "Added message",
+        http::StatusCode::CREATED,
+    ))
+}
+
 async fn core_main() -> Result<(), Box<dyn std::error::Error>> {
     let decorator = slog_term::TermDecorator::new().build();
     let drain = slog_term::FullFormat::new(decorator).build().fuse();
@@ -71,8 +90,17 @@ async fn core_main() -> Result<(), Box<dyn std::error::Error>> {
         .and_then(handle_messages)
         .with(log_filter);
 
+    let add_message = warp::post()
+        .and(warp::path("add"))
+        .and(warp::path::end())
+        .and(json_body())
+        .and(store_filter.clone())
+        .and_then(add_message);
+
+    let routes = messages.or(add_message);
+
     let addr: SocketAddr = "0.0.0.0:5555".parse().unwrap();
-    let (addr, serve) = warp::serve(messages).bind_ephemeral(addr);
+    let (addr, serve) = warp::serve(routes).bind_ephemeral(addr);
 
     info!(log, "Listening on http://{}", addr);
     serve.await;

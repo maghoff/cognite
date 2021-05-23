@@ -15,6 +15,12 @@ Test with `curl`:
 
     curl http://localhost:5555/messages
 
+Send a message with `curl`:
+
+    curl http://localhost:5555/add \
+        -H Content-Type:application/json \
+        -d '{"id":3,"text":"System working?"}'
+
 ## Client
 
 ```bash
