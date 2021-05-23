@@ -1,0 +1,30 @@
+# Cognite Chat
+
+Programming test for my application to Cognite.
+
+## Server
+
+```bash
+cd server
+cargo run
+```
+
+Server is now listening on <http://0.0.0.0:5555>.
+
+Test with `curl`:
+
+    curl http://localhost:5555/messages
+
+## Client
+
+```bash
+cd client
+npm start
+```
+
+This will start a development server which proxies some requests to the
+server side. It is listening on <http://0.0.0.0:3000>.
+
+Test proxying with `curl`:
+
+    curl http://localhost:3000/messages
