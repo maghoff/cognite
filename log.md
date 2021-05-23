@@ -19,3 +19,15 @@ Then, I might consider some of these stretch goals:
  * User IDs/names
  * Support for different rooms/direct messages between users
  * Storage backend (SQLite)
+
+08:55: Wifi problems while running `npm install` and similar.
+09:00: Wifi problems resolved.
+
+09:00: Grr, unexpected error from `npx create-react-app my-app --template typescript`.
+
+Must try not to get sidetracked by debugging this.
+
+Apparently fixed with `npm cache clean --force`. Cache maybe poisoned from
+above mentioned Wifi issues.
+
+10:45: Deadline
