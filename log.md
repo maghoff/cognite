@@ -36,4 +36,12 @@ above mentioned Wifi issues.
 Realising that my React has gotten rusty. Considering whether to ditch the
 server side entirely. Hm.
 
+10:00: Starting server side work. LEEEEEEEEERROOY JENKINS!
+
+Plan:
+
+ 1. Serve out static list of messages
+ 2. Update client to read messages from server on load
+ 3. Add endpoint for posting a new message
+
 10:45: Deadline
