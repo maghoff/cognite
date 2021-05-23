@@ -2,6 +2,7 @@ use serde_derive::Serialize;
 use slog::{info, o};
 use slog::{Drain, Logger};
 use std::net::SocketAddr;
+use std::sync::{Arc, Mutex};
 use warp::{http::HeaderValue, hyper::header::CONTENT_TYPE, Filter, Rejection, Reply};
 
 #[derive(Serialize)]
@@ -10,21 +11,38 @@ struct Message {
     text: String,
 }
 
-async fn handle_messages() -> Result<impl Reply, Rejection> {
-    let messages = vec![
-        Message {
-            id: 0,
-            text: "Hello, Joe!".to_string(),
-        },
-        Message {
-            id: 1,
-            text: "Hello, Mike!".to_string(),
-        },
-    ];
+type Messages = Vec<Message>;
 
-    let mut res = warp::reply::Response::new(serde_json::to_string(&messages).unwrap().into());
+#[derive(Clone)]
+struct Store {
+    messages: Arc<Mutex<Messages>>,
+}
+
+impl Store {
+    fn new() -> Self {
+        Store {
+            messages: Arc::new(Mutex::new(vec![
+                Message {
+                    id: 0,
+                    text: "Hello, Joe!".to_string(),
+                },
+                Message {
+                    id: 1,
+                    text: "Hello, Mike!".to_string(),
+                },
+            ])),
+        }
+    }
+}
+
+async fn handle_messages(store: Store) -> Result<impl Reply, Rejection> {
+    let messages = store.messages.lock().unwrap();
+
+    let mut res = warp::reply::Response::new(serde_json::to_string(&*messages).unwrap().into());
+
     res.headers_mut()
         .insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
+
     Ok(res)
 }
 
@@ -45,7 +63,11 @@ async fn core_main() -> Result<(), Box<dyn std::error::Error>> {
         );
     });
 
+    let store = Store::new();
+    let store_filter = warp::any().map(move || store.clone());
+
     let messages = warp::path("messages")
+        .and(store_filter.clone())
         .and_then(handle_messages)
         .with(log_filter);
 

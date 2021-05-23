@@ -30,7 +30,7 @@ function ChatWindow(props: Props) {
                 {props.messages.map(RenderMessage)}
             </div>
             <form onSubmit={(ev) => doSend(ev, props)}>
-                <input className="ChatWindow--Input" value={props.input} onChange={props.onChange} />
+                <input placeholder="Say something…" className="ChatWindow--Input" value={props.input} onChange={props.onChange} />
             </form>
         </div>
     );

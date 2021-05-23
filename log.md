@@ -44,4 +44,6 @@ Plan:
  2. Update client to read messages from server on load
  3. Add endpoint for posting a new message
 
+10:30: 1 and 2 done
+
 10:45: Deadline
