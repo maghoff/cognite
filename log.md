@@ -32,4 +32,8 @@ above mentioned Wifi issues.
 
 09:11: Committed generated client side.
 
+09:42: Committed basic event propagation and state handling in client.
+Realising that my React has gotten rusty. Considering whether to ditch the
+server side entirely. Hm.
+
 10:45: Deadline

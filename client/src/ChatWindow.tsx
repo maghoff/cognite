@@ -9,6 +9,7 @@ type Props = {
     messages: Message[],
     input: string,
     onChange: React.ChangeEventHandler<HTMLInputElement>,
+    sendMessage: (message: string) => void,
 };
 
 function RenderMessage(message: Message) {
@@ -17,13 +18,20 @@ function RenderMessage(message: Message) {
     );
 }
 
+function doSend(ev: React.FormEvent<HTMLFormElement>, props: Props) {
+    ev.preventDefault();
+    props.sendMessage(props.input);
+}
+
 function ChatWindow(props: Props) {
     return (
         <div className="ChatWindow">
             <div className="ChatWindow--Output">
                 {props.messages.map(RenderMessage)}
             </div>
-            <input className="ChatWindow--Input" value={props.input} onChange={props.onChange} />
+            <form onSubmit={(ev) => doSend(ev, props)}>
+                <input className="ChatWindow--Input" value={props.input} onChange={props.onChange} />
+            </form>
         </div>
     );
 }
